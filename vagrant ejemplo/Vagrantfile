@@ -20,11 +20,11 @@ Vagrant.configure("2") do |config|
   config.vm.define "database" do |database|
     database.vm.box = "rockylinux/9"
     database.vm.network "private_network", ip: "192.168.57.11"  #creamos interfaz de red en red privada
-    database.vm.provision "shell", inline: <<-SCRIPT #para introducir varios comandos <<-PALABRA     comandos     PALABRA
+    database.vm.provision "shell", inline: <<-script #para introducir varios comandos <<-PALABRA     comandos     PALABRA
       dnf check-update
       dnf update -y
       dnf install mariadb -y
-    SCRIPT
+    script
   end 
   config.vm.define "app" do |app|
     app.vm.box = "ubuntu/focal64"
@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
       apt update
       apt upgrade -y
       apt install flask -y
-    SCRIPT
+    script
   end 
 
 end
