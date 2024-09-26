@@ -4,20 +4,19 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "base"
   #Configuracion del provider de los recursos para VM
-  config.vm.provider "virtualbox" do |vb| #configuracion de proveedor de VM (virtualbox amazon google cloud etc)
-    
-  end
-  
+
+  #Revproxy
   config.vm.define "revproxy" do |revproxy|
     revproxy.vm.box = "debian/bullseye64"
     revproxy.vm.network "forwarded_port" , guest: 80, host: 8080 #abrimos puerto 80 en VM
-    revproxy.vm.network "private_network", ip: "192.168.57.10"  #creamos interfaz de red en red privada
-    revproxy.vm.provision "shell", inline: <<-SCRIPT #para introducir varios comandos <<-PALABRA     comandos     PALABRA
-      apt-get update
-      apt-get upgrade -y
+    revproxy.vm.network "private_network", ip: "192.168.57.10"  #Red Privada + IP
+    revproxy.vm.provision "shell", inline: <<-script
+      apt update
+      apt upgrade -y
       apt install nginx -y
-    SCRIPT
+    script
   end 
+  #Database
   config.vm.define "database" do |database|
     database.vm.box = "rockylinux/9"
     database.vm.network "private_network", ip: "192.168.57.11"  #creamos interfaz de red en red privada
@@ -31,8 +30,8 @@ Vagrant.configure("2") do |config|
     app.vm.box = "ubuntu/focal64"
     app.vm.network "private_network", ip: "192.168.57.13"  #creamos interfaz de red en red privada
     app.vm.provision "shell", inline: <<-SCRIPT #para introducir varios comandos <<-PALABRA     comandos     PALABRA
-      apt-get update
-      apt-get upgrade -y
+      apt update
+      apt upgrade -y
       apt install flask -y
     SCRIPT
   end 
