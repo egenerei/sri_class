@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "base"
+  #Configuracion del provider de los recursos para VM
+  config.vm.provision "shell", inline: <<-script
+      apt update
+      apt upgrade -y
+    script
+  #Revproxy
+  config.vm.define "revproxy" do |revproxy|
+    revproxy.vm.box = "debian/bullseye64"
+    revproxy.vm.network "forwarded_port" , guest: 80, host: 8080 #abrimos puerto 80 en VM
+    revproxy.vm.network "private_network", ip: "192.168.57.10"  #Red Privada + IP
+    revproxy.vm.provision "shell", inline: <<-script
+      apt install nginx -y
+    script
+  end 
+  #Database
+  config.vm.define "database" do |database|
+    database.vm.box = "rockylinux/9"
+    database.vm.network "private_network", ip: "192.168.57.11"  #creamos interfaz de red en red privada
+    database.vm.provision "shell", inline: <<-script #para introducir varios comandos <<-PALABRA     comandos     PALABRA
+      dnf check-update
+      dnf update -y
+      dnf install mariadb -y
+    script
+  end 
+  config.vm.define "app" do |app|
+    app.vm.box = "ubuntu/focal64"
+    app.vm.network "private_network", ip: "192.168.57.13"  #creamos interfaz de red en red privada
+    app.vm.provision "shell", inline: <<-script #para introducir varios comandos <<-PALABRA     comandos     PALABRA
+      apt install flask -y
+    script
+  end 
+
+end
